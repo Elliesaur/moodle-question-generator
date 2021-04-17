@@ -120,13 +120,13 @@ function createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format,
 
     // Question Text.
     var qText = doc.createElement('questiontext');
-    qText.setAttribute('format', 'markup');
+    qText.setAttribute('format', 'html');
     createTextElementWithValue(doc, qText, text, true);
     q.appendChild(qText);
 
     // General Feedback.
     var qGeneralFeedback = doc.createElement('generalfeedback');
-    qGeneralFeedback.setAttribute('format', 'markup');
+    qGeneralFeedback.setAttribute('format', 'html');
     createTextElementWithValue(doc, qGeneralFeedback, genFeed, true);
     q.appendChild(qGeneralFeedback);
 
@@ -154,7 +154,7 @@ function createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format,
 
     // Grader feedback/info.
     var qGraderInfo = doc.createElement('graderinfo');
-    qGraderInfo.setAttribute('format', 'markup');
+    qGraderInfo.setAttribute('format', 'html');
     createTextElementWithValue(doc, qGraderInfo, graderInfo, true);
     q.appendChild(qGraderInfo);
 
