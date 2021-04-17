@@ -56,14 +56,14 @@ function getQuestion(quiz, doc, qElem) {
     }
 
     var name = qElem.find('#question-name-' + qid).val();
-    var text = qElem.find('#question-text-' + qid).val();
+    var text = qElem.find('#question-text-' + qid).data('text-quill').root.innerHTML;
     var hasWildcards = /{[\w\s\d-\|]+}/gi.test(text);
     var mark = qElem.find('#question-default-mark-' + qid).val();
-    var genFeed = qElem.find('#question-general-feedback-' + qid).val();
+    var genFeed = qElem.find('#question-general-feedback-' + qid).data('genFeed-quill').root.innerHTML;
     var format = qElem.find('#question-response-format-' + qid).val();
     var reqText = qElem.find('#question-require-text-' + qid).val();
     var boxSize = qElem.find('#question-input-box-' + qid).val();
-    var graderInfo = qElem.find('#question-grader-info-' + qid).val();
+    var graderInfo = qElem.find('#question-grader-info-' + qid).data('graderInfo-quill').root.innerHTML;
 
     if (!hasWildcards) {
         createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo);
@@ -199,8 +199,37 @@ function createCategory(quiz, doc, categoryName, previousCategory) {
     quiz.appendChild(q);
 }
 
-$(document).ready(function () {
+var toolbarOptions = [
+    [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+    [{ 'align': [] }],
     
+    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+    ['blockquote', 'code-block'],
+  
+    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+    [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+    [{ 'direction': 'rtl' }],                         // text direction
+
+    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+    
+    ['image'],
+
+    ['clean']                                         // remove formatting button
+];
+var quillOptions = {
+     modules: {
+        toolbar: toolbarOptions,
+        htmlEditButton: {
+            syntax: true,
+        }
+    },
+    theme: 'snow'
+};
+$(document).ready(function () {
+    Quill.register("modules/htmlEditButton", htmlEditButton);
+
     $('#add-question').click(function () {
         var template = $('#question-template').clone();
         var appendTo = $('#questions');
@@ -210,8 +239,13 @@ $(document).ready(function () {
         template.html(function() { 
             return $(this).html().replace(/NUMBER/g, newQuestionNumber);
         });
-
         appendTo.append(template);
+        $('#question-text-' + newQuestionNumber).data('text-quill', new Quill('#question-text-' + newQuestionNumber, quillOptions));
+        $('#question-general-feedback-' + newQuestionNumber).data('genFeed-quill', new Quill('#question-general-feedback-' + newQuestionNumber, quillOptions));
+        $('#question-grader-info-' + newQuestionNumber).data('graderInfo-quill', new Quill('#question-grader-info-' + newQuestionNumber, quillOptions));
+
+        // Fix HTML text size.
+        $('[data-qid="' + newQuestionNumber + '"]').find('.ql-toolbar .ql-formats > button[title^="Show HTML"]').css('font-size', '0.8em');
     });
 
     $('#generate').click(createXmlForQuestions);
