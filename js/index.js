@@ -57,7 +57,7 @@ function getQuestion(quiz, doc, qElem) {
 
     var name = qElem.find('#question-name-' + qid).val();
     var text = qElem.find('#question-text-' + qid).data('text-quill').root.innerHTML;
-    var hasWildcards = /{[\w\s\d-\|]+}/gi.test(text);
+    var hasWildcards = /{.*}/gi.test(text);
     var mark = qElem.find('#question-default-mark-' + qid).val();
     var genFeed = qElem.find('#question-general-feedback-' + qid).data('genFeed-quill').root.innerHTML;
     var format = qElem.find('#question-response-format-' + qid).val();
@@ -68,7 +68,7 @@ function getQuestion(quiz, doc, qElem) {
     if (!hasWildcards) {
         createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo);
     } else {
-        var orWildcards = Array.from(text.matchAll(/{[\w\s\d\|]+}/gi));
+        var orWildcards = Array.from(text.matchAll(/{.*?[\|].*?}/gi));
         var rangeWildcards = Array.from(text.matchAll(/{[\d-]+}/gi));
         
         var orWildcardsFiltered = [];
