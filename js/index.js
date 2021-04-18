@@ -34,7 +34,7 @@ function createXmlForQuestions() {
 
     var filename = "Moodle EQG Questions.xml";
     var pom = document.createElement('a');
-    var bb = new Blob([xmlString], {type: 'text/plain'});
+    var bb = new Blob(['<?xml version="1.0" encoding="UTF-8"?>'+xmlString], {type: 'text/plain'});
 
     pom.setAttribute('href', window.URL.createObjectURL(bb));
     pom.setAttribute('download', filename);
