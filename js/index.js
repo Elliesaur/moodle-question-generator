@@ -208,6 +208,16 @@ var summernoteOptions = {
             ['remove', ['removeMedia']]
         ],
     },
+    toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'underline', 'superscript', 'subscript', 'clear']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'hr']],
+        ['view', ['fullscreen', 'codeview', 'help']],
+    ],
     lang: 'en-US',
     height: 200,
     imageAttributes:{
