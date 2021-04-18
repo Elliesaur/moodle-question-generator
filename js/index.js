@@ -56,14 +56,14 @@ function getQuestion(quiz, doc, qElem) {
     }
 
     var name = qElem.find('#question-name-' + qid).val();
-    var text = qElem.find('#question-text-' + qid).data('text-quill').root.innerHTML;
+    var text = qElem.find('#question-text-' + qid).summernote('code');
     var hasWildcards = /{.*}/gi.test(text);
     var mark = qElem.find('#question-default-mark-' + qid).val();
-    var genFeed = qElem.find('#question-general-feedback-' + qid).data('genFeed-quill').root.innerHTML;
+    var genFeed = qElem.find('#question-general-feedback-' + qid).summernote('code');
     var format = qElem.find('#question-response-format-' + qid).val();
     var reqText = qElem.find('#question-require-text-' + qid).val();
     var boxSize = qElem.find('#question-input-box-' + qid).val();
-    var graderInfo = qElem.find('#question-grader-info-' + qid).data('graderInfo-quill').root.innerHTML;
+    var graderInfo = qElem.find('#question-grader-info-' + qid).summernote('code');
 
     if (!hasWildcards) {
         createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo);
@@ -199,36 +199,25 @@ function createCategory(quiz, doc, categoryName, previousCategory) {
     quiz.appendChild(q);
 }
 
-var toolbarOptions = [
-    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],        // Size does not work.
-    [{ 'align': [] }],
-    
-    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-    ['blockquote', 'code-block'],
-  
-    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-    [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-    [{ 'direction': 'rtl' }],                         // text direction
-
-    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-    
-    ['image'],
-
-    ['clean']                                         // remove formatting button
-];
-var quillOptions = {
-     modules: {
-        toolbar: toolbarOptions,
-        htmlEditButton: {
-            syntax: true,
-        }
+var summernoteOptions = {
+    popover: {
+        image: [
+            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
+            ['float', ['floatLeft', 'floatRight', 'floatNone']],
+            ['custom', ['imageAttributes']],
+            ['remove', ['removeMedia']]
+        ],
     },
-    theme: 'snow'
+    lang: 'en-US',
+    height: 200,
+    imageAttributes:{
+        icon:'<i class="note-icon-pencil"/>',
+        removeEmpty: false, 
+        disableUpload: true
+    }
 };
+
 $(document).ready(function () {
-    Quill.register("modules/htmlEditButton", htmlEditButton);
 
     $('#add-question').click(function () {
         var template = $('#question-template').clone();
@@ -240,12 +229,11 @@ $(document).ready(function () {
             return $(this).html().replace(/NUMBER/g, newQuestionNumber);
         });
         appendTo.append(template);
-        $('#question-text-' + newQuestionNumber).data('text-quill', new Quill('#question-text-' + newQuestionNumber, quillOptions));
-        $('#question-general-feedback-' + newQuestionNumber).data('genFeed-quill', new Quill('#question-general-feedback-' + newQuestionNumber, quillOptions));
-        $('#question-grader-info-' + newQuestionNumber).data('graderInfo-quill', new Quill('#question-grader-info-' + newQuestionNumber, quillOptions));
 
-        // Fix HTML text size.
-        $('[data-qid="' + newQuestionNumber + '"]').find('.ql-toolbar .ql-formats > button[title^="Show HTML"]').css('font-size', '0.8em');
+        $('#question-text-' + newQuestionNumber).summernote(summernoteOptions);
+        $('#question-general-feedback-' + newQuestionNumber).summernote(summernoteOptions);
+        $('#question-grader-info-' + newQuestionNumber).summernote(summernoteOptions);
+
     });
 
     $('#generate').click(createXmlForQuestions);
