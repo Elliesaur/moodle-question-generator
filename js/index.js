@@ -15,7 +15,8 @@ function createXmlForQuestions() {
     questionElems.each(function () { 
         var qid = $(this).find('.col-md-12').attr('data-qid');
         var text = $(this).find('#question-text-' + qid).val();
-        if (/{[\w\s\d-\|]+}/gi.test(text)) {
+        // If it has wildcards...
+        if (/{.*}/gi.test(text)) {
             wildcardQuestions.push($(this));
         } else {
             noWildcardQuestions.push($(this));
