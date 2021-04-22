@@ -65,9 +65,10 @@ function getQuestion(quiz, doc, qElem) {
     var reqText = qElem.find('#question-require-text-' + qid).val();
     var boxSize = qElem.find('#question-input-box-' + qid).val();
     var graderInfo = qElem.find('#question-grader-info-' + qid).summernote('code');
+    var responseTemplate = qElem.find('#question-response-template-' + qid).summernote('code');
 
     if (!hasWildcards) {
-        createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo);
+        createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo, responseTemplate);
     } else {
         var orWildcards = Array.from(text.matchAll(/{.*?[\|].*?}/gi));
         var rangeWildcards = Array.from(text.matchAll(/{[\d-]+}/gi));
@@ -102,14 +103,14 @@ function getQuestion(quiz, doc, qElem) {
 
         // Create questions for all.
         questionsToCreate.forEach(function (val, idx) {
-            createXmlForQuestion(quiz, doc, qid, name + idx, val, mark, genFeed, format, reqText, boxSize, graderInfo);
+            createXmlForQuestion(quiz, doc, qid, name + idx, val, mark, genFeed, format, reqText, boxSize, graderInfo, responseTemplate);
         });
 
     }
 }
-function createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo) {
+function createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo, responseTemplate) {
 
-    console.log(qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo);
+    console.log(qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo, responseTemplate);
 
     var q = doc.createElement('question');
     q.setAttribute('type', 'essay');
@@ -159,10 +160,10 @@ function createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format,
     createTextElementWithValue(doc, qGraderInfo, graderInfo, true);
     q.appendChild(qGraderInfo);
 
-    // Response Template: unimplemented.
+    // Response Template.
     var qRespTemplate = doc.createElement('responsetemplate');
     qRespTemplate.setAttribute('format', 'html');
-    createTextElementWithValue(doc, qRespTemplate, '', false);
+    createTextElementWithValue(doc, qRespTemplate, responseTemplate, true);
     q.appendChild(qRespTemplate);
 
     quiz.appendChild(q);
@@ -258,6 +259,7 @@ $(document).ready(function () {
         $('#question-text-' + newQuestionNumber).summernote(summernoteOptions);
         $('#question-general-feedback-' + newQuestionNumber).summernote(summernoteOptions);
         $('#question-grader-info-' + newQuestionNumber).summernote(summernoteOptions);
+        $('#question-response-template-' + newQuestionNumber).summernote(summernoteOptions);
 
     });
 
