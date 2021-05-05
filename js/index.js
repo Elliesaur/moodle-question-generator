@@ -14,7 +14,10 @@ function createXmlForQuestions() {
 
     questionElems.each(function () { 
         var qid = $(this).find('.col-md-12').attr('data-qid');
-        var text = $(this).find('#question-text-' + qid).summernote('code');
+        if (qid === "NUMBER") {
+            return;
+        }
+        var text = $(this).find('#question-text-' + qid).data('editor').getContents();
         // If it has wildcards...
         if (/{.*}/gi.test(text)) {
             wildcardQuestions.push($(this));
@@ -57,15 +60,15 @@ function getQuestion(quiz, doc, qElem) {
     }
 
     var name = qElem.find('#question-name-' + qid).val();
-    var text = qElem.find('#question-text-' + qid).summernote('code');
+    var text = qElem.find('#question-text-' + qid).data('editor').getContents();
     var hasWildcards = /{.*}/gi.test(text);
     var mark = qElem.find('#question-default-mark-' + qid).val();
-    var genFeed = qElem.find('#question-general-feedback-' + qid).summernote('code');
+    var genFeed = qElem.find('#question-general-feedback-' + qid).data('editor').getContents();
     var format = qElem.find('#question-response-format-' + qid).val();
     var reqText = qElem.find('#question-require-text-' + qid).val();
     var boxSize = qElem.find('#question-input-box-' + qid).val();
-    var graderInfo = qElem.find('#question-grader-info-' + qid).summernote('code');
-    var responseTemplate = qElem.find('#question-response-template-' + qid).summernote('code');
+    var graderInfo = qElem.find('#question-grader-info-' + qid).data('editor').getContents();
+    var responseTemplate = qElem.find('#question-response-template-' + qid).data('editor').getContents();
 
     if (!hasWildcards) {
         createXmlForQuestion(quiz, doc, qid, name, text, mark, genFeed, format, reqText, boxSize, graderInfo, responseTemplate);
@@ -201,46 +204,32 @@ function createCategory(quiz, doc, categoryName, previousCategory) {
     quiz.appendChild(q);
 }
 
-var summernoteOptions = {
-    popover: {
-        image: [
-            ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone']],
-            ['float', ['floatLeft', 'floatRight', 'floatNone']],
-            ['custom', ['imageAttributes']],
-            ['remove', ['removeMedia']]
-        ],
-    },
-    toolbar: [
-        ['style', ['style']],
-        ['font', ['bold', 'underline', 'superscript', 'subscript', 'clear']],
-        ['fontsize', ['fontsize']],
-        ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
-        ['table', ['table']],
-        ['insert', ['link', 'picture', 'hr']],
-        ['cleaner',['cleaner']],
-        ['view', ['fullscreen', 'codeview', 'help']],
+var kothingEditorOptions = {
+    display: "block",
+    width: "100%",
+    height: "200px",
+    popupDisplay: "full",
+    toolbarItem: [
+      ["undo", "redo"],
+      ["formatBlock"],
+      [
+        "bold",
+        "underline",
+        "italic",
+        "strike",
+        "subscript",
+        "superscript",
+        "fontColor",
+        "hiliteColor",
+      ],
+      ["outdent", "indent", "align", "list", "horizontalRule"],
+      ["link", "table", "image"],
+      ["lineHeight", "paragraphStyle", "textStyle"],
+      ["showBlocks", "codeView"],
+      ["preview", "fullScreen"],
+      ["removeFormat"],
     ],
-    lang: 'en-US',
-    height: 200,
-    imageAttributes:{
-        icon:'<i class="note-icon-pencil"/>',
-        removeEmpty: false, 
-        disableUpload: true
-    },
-    cleaner:{
-        action: 'button', 
-        newline: '<br>', 
-        keepHtml: true,
-        icon: '<i class="note-icon"><svg xmlns="http://www.w3.org/2000/svg" id="libre-paintbrush" viewBox="0 0 14 14" width="14" height="14"><path d="m 11.821425,1 q 0.46875,0 0.82031,0.311384 0.35157,0.311384 0.35157,0.780134 0,0.421875 -0.30134,1.01116 -2.22322,4.212054 -3.11384,5.035715 -0.64956,0.609375 -1.45982,0.609375 -0.84375,0 -1.44978,-0.61942 -0.60603,-0.61942 -0.60603,-1.469866 0,-0.857143 0.61608,-1.419643 l 4.27232,-3.877232 Q 11.345985,1 11.821425,1 z m -6.08705,6.924107 q 0.26116,0.508928 0.71317,0.870536 0.45201,0.361607 1.00781,0.508928 l 0.007,0.475447 q 0.0268,1.426339 -0.86719,2.32366 Q 5.700895,13 4.261155,13 q -0.82366,0 -1.45982,-0.311384 -0.63616,-0.311384 -1.0212,-0.853795 -0.38505,-0.54241 -0.57924,-1.225446 -0.1942,-0.683036 -0.1942,-1.473214 0.0469,0.03348 0.27455,0.200893 0.22768,0.16741 0.41518,0.29799 0.1875,0.130581 0.39509,0.24442 0.20759,0.113839 0.30804,0.113839 0.27455,0 0.3683,-0.247767 0.16741,-0.441965 0.38505,-0.753349 0.21763,-0.311383 0.4654,-0.508928 0.24776,-0.197545 0.58928,-0.31808 0.34152,-0.120536 0.68974,-0.170759 0.34821,-0.05022 0.83705,-0.07031 z"/></svg></i>',
-        keepOnlyTags: ['<table>', '<tbody>', '<tr>', '<td>', '<p>', '<b>', '<div>', '<br>', '<font>', '<ul>', '<li>', '<strong>', '<i>', '<a>', '<span>'], // If keepHtml is true, remove all tags except these
-        keepClasses: false,
-        badTags: ['script', 'applet', 'embed', 'noframes', 'noscript'],
-        badAttributes: ['start'],
-        limitChars: false, 
-        limitDisplay: 'none',
-        limitStop: false
-  }
+    charCounter: true,
 };
 
 $(document).ready(function () {
@@ -256,10 +245,15 @@ $(document).ready(function () {
         });
         appendTo.append(template);
 
-        $('#question-text-' + newQuestionNumber).summernote(summernoteOptions);
-        $('#question-general-feedback-' + newQuestionNumber).summernote(summernoteOptions);
-        $('#question-grader-info-' + newQuestionNumber).summernote(summernoteOptions);
-        $('#question-response-template-' + newQuestionNumber).summernote(summernoteOptions);
+
+        $('#question-general-feedback-' + newQuestionNumber).data('editor', 
+            KothingEditor.create('question-general-feedback-' + newQuestionNumber, kothingEditorOptions));
+        $('#question-grader-info-' + newQuestionNumber).data('editor', 
+            KothingEditor.create('question-grader-info-' + newQuestionNumber, kothingEditorOptions));
+        $('#question-response-template-' + newQuestionNumber).data('editor', 
+            KothingEditor.create('question-response-template-' + newQuestionNumber, kothingEditorOptions));
+        $('#question-text-' + newQuestionNumber).data('editor', 
+            KothingEditor.create('question-text-' + newQuestionNumber, kothingEditorOptions));
 
     });
 
